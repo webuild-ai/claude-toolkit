@@ -1,10 +1,10 @@
-.PHONY: install uninstall list help
+.PHONY: install uninstall list check help
 
 CLAUDE_COMMANDS_DIR := $(HOME)/.claude/commands
-COMMANDS := $(filter-out README.md,$(wildcard *.md))
+COMMANDS := $(wildcard commands/*.md)
 
 help: ## Show this help message
-	@echo "Claude Code Personal Commands"
+	@echo "Claude Toolkit"
 	@echo ""
 	@echo "Usage: make [target]"
 	@echo ""
@@ -16,7 +16,7 @@ install: ## Install commands to ~/.claude/commands
 	@mkdir -p $(CLAUDE_COMMANDS_DIR)
 	@for cmd in $(COMMANDS); do \
 		cp $$cmd $(CLAUDE_COMMANDS_DIR)/; \
-		echo "  Installed: $$cmd"; \
+		echo "  ✓ Installed: $$(basename $$cmd)"; \
 	done
 	@echo ""
 	@echo "Done! Commands installed to $(CLAUDE_COMMANDS_DIR)"
@@ -29,8 +29,8 @@ install: ## Install commands to ~/.claude/commands
 uninstall: ## Remove installed commands from ~/.claude/commands
 	@echo "Uninstalling Claude Code commands..."
 	@for cmd in $(COMMANDS); do \
-		rm -f $(CLAUDE_COMMANDS_DIR)/$$cmd; \
-		echo "  Removed: $$cmd"; \
+		rm -f $(CLAUDE_COMMANDS_DIR)/$$(basename $$cmd); \
+		echo "  ✗ Removed: $$(basename $$cmd)"; \
 	done
 	@echo "Done!"
 
@@ -43,9 +43,9 @@ list: ## List available commands
 check: ## Check if commands are installed
 	@echo "Checking installed commands..."
 	@for cmd in $(COMMANDS); do \
-		if [ -f "$(CLAUDE_COMMANDS_DIR)/$$cmd" ]; then \
-			echo "  ✓ $$cmd (installed)"; \
+		if [ -f "$(CLAUDE_COMMANDS_DIR)/$$(basename $$cmd)" ]; then \
+			echo "  ✓ $$(basename $$cmd) (installed)"; \
 		else \
-			echo "  ✗ $$cmd (not installed)"; \
+			echo "  ✗ $$(basename $$cmd) (not installed)"; \
 		fi \
 	done

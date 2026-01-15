@@ -2,52 +2,56 @@
 
 A collection of tools, commands, and utilities for [Claude Code](https://github.com/anthropics/claude-code) and Claude workflows.
 
-## Commands
-
-Personal slash commands for Claude Code:
-
-### Available Commands
-
-| Command | Description |
-|---------|-------------|
-| `/sanitycheck` | Comprehensive pre-commit validation with 16 checks including linting, tests, security, accessibility, and more |
-
 ## Installation
 
-### Quick Install
-
 ```bash
+git clone https://github.com/YOUR_USERNAME/claude-toolkit.git
+cd claude-toolkit
 make install
 ```
 
-### Manual Install
+## Commands
 
-Copy the command files to your Claude Code personal commands directory:
+Personal slash commands for Claude Code.
 
-```bash
-mkdir -p ~/.claude/commands
-cp *.md ~/.claude/commands/ 2>/dev/null || true
-# Exclude README from commands
-rm -f ~/.claude/commands/README.md
-```
+| Command | Description |
+|---------|-------------|
+| `/sanitycheck` | Comprehensive pre-commit validation with 16 checks |
 
-## Uninstall
+### /sanitycheck
 
-```bash
-make uninstall
-```
+Performs 16 comprehensive checks before committing:
+
+| # | Check | Description |
+|---|-------|-------------|
+| 1 | Console Cleanup | Remove debug statements |
+| 2 | Formatting | Verify code formatting (Prettier) |
+| 3 | Exception/Logging | Validate error handling |
+| 4 | Imports | Clean up unused/duplicate imports |
+| 5 | Dead Code | Find unused code |
+| 6 | Security | Scan for vulnerabilities, secrets, XSS |
+| 7 | Accessibility | WCAG compliance checks |
+| 8 | Git Workflow | Merge conflicts, secrets, conventions |
+| 9 | Linting | ESLint + TypeScript checks |
+| 10 | Dependency Audit | npm audit for vulnerabilities |
+| 11 | TODO/FIXME | Track new comments |
+| 12 | Environment Vars | Check env var handling |
+| 13 | Lock File | package-lock.json consistency |
+| 14 | Bundle Size | Check bundle size impact |
+| 15 | Tests | Run tests, add if needed |
+| 16 | Build | Verify successful build |
 
 ## Usage
 
-Once installed, use the commands in any Claude Code session:
+Once installed, use commands in any Claude Code session:
 
 ```
 /sanitycheck
 ```
 
-## Adding to Pre-Commit Workflow
+### Auto-run Before Commits
 
-To automatically run `/sanitycheck` before every git commit, add the following to your `~/.claude/CLAUDE.md`:
+Add to your `~/.claude/CLAUDE.md` to automatically run before every git commit:
 
 ```markdown
 ## Pre-Commit Requirements
@@ -58,46 +62,34 @@ To automatically run `/sanitycheck` before every git commit, add the following t
 - Using any git MCP tools
 - Being asked to commit changes
 
-This is a mandatory step - do not skip it. The sanity check ensures code quality, security, and consistency before any code is committed.
+This is a mandatory step - do not skip it.
 ```
-
-## Command Details
-
-### /sanitycheck
-
-Performs 16 comprehensive checks before committing:
-
-1. **Console Statement Cleanup** - Remove debug statements
-2. **Formatting Check** - Verify code formatting (Prettier)
-3. **Exception and Logging Review** - Validate error handling
-4. **Import Review** - Clean up unused/duplicate imports
-5. **Dead Code Detection** - Find unused code
-6. **Security Checks** - Scan for vulnerabilities, secrets, XSS
-7. **Accessibility (a11y) Review** - WCAG compliance
-8. **Git Workflow Checks** - Merge conflicts, secrets, conventions
-9. **Linting** - ESLint + TypeScript checks
-10. **Dependency Audit** - npm audit for vulnerabilities
-11. **TODO/FIXME Review** - Track new comments
-12. **Environment Variable Validation** - Check env var handling
-13. **Lock File Sync** - package-lock.json consistency
-14. **Bundle Size Impact** - Check bundle size changes
-15. **Tests** - Run tests, add if needed
-16. **Build Verification** - Verify successful build
 
 ## Structure
 
 ```
 claude-toolkit/
-├── commands/           # Slash commands (future)
-├── *.md               # Command files (install to ~/.claude/commands/)
-├── Makefile           # Installation automation
+├── commands/              # Slash commands for Claude Code
+│   └── sanitycheck.md
+├── Makefile               # Installation automation
 └── README.md
+```
+
+## Make Targets
+
+```bash
+make install    # Install commands to ~/.claude/commands
+make uninstall  # Remove installed commands
+make list       # List available commands
+make check      # Check installation status
+make help       # Show help
 ```
 
 ## Contributing
 
 Contributions welcome! This toolkit can include:
-- **Commands** - Slash commands for Claude Code (`.md` files)
+
+- **Commands** - Slash commands for Claude Code
 - **Prompts** - Reusable prompt templates
 - **Hooks** - Pre/post execution hooks
 - **Configs** - Claude Code configuration examples
