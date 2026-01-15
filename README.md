@@ -1,8 +1,12 @@
-# Claude Code Personal Commands
+# Claude Toolkit
 
-A collection of personal slash commands for [Claude Code](https://github.com/anthropics/claude-code).
+A collection of tools, commands, and utilities for [Claude Code](https://github.com/anthropics/claude-code) and Claude workflows.
 
-## Available Commands
+## Commands
+
+Personal slash commands for Claude Code:
+
+### Available Commands
 
 | Command | Description |
 |---------|-------------|
@@ -80,9 +84,24 @@ Performs 16 comprehensive checks before committing:
 15. **Tests** - Run tests, add if needed
 16. **Build Verification** - Verify successful build
 
+## Structure
+
+```
+claude-toolkit/
+├── commands/           # Slash commands (future)
+├── *.md               # Command files (install to ~/.claude/commands/)
+├── Makefile           # Installation automation
+└── README.md
+```
+
 ## Contributing
 
-Feel free to add new commands! Each command should be a markdown file with instructions for Claude Code to follow.
+Contributions welcome! This toolkit can include:
+- **Commands** - Slash commands for Claude Code (`.md` files)
+- **Prompts** - Reusable prompt templates
+- **Hooks** - Pre/post execution hooks
+- **Configs** - Claude Code configuration examples
+- **Scripts** - Helper scripts for Claude workflows
 
 ## License
 
