@@ -17,7 +17,7 @@
 
 ```bash
 # Clone the repository
-git clone https://github.com/YOUR_USERNAME/claude-toolkit.git
+git clone https://github.com/webuild-ai/claude-toolkit.git
 cd claude-toolkit
 
 # Install all commands
@@ -177,6 +177,6 @@ MIT License - feel free to use and modify for your projects!
 
 **Made with ❤️ for the Claude Code community**
 
-[Report Bug](https://github.com/YOUR_USERNAME/claude-toolkit/issues) · [Request Feature](https://github.com/YOUR_USERNAME/claude-toolkit/issues) · [Documentation](https://github.com/YOUR_USERNAME/claude-toolkit/wiki)
+[Report Bug](https://github.com/webuild-ai/claude-toolkit/issues) · [Request Feature](https://github.com/webuild-ai/claude-toolkit/issues) · [Documentation](https://github.com/webuild-ai/claude-toolkit/wiki)
 
 </div>
