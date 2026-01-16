@@ -1,0 +1,56 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Test Coverage Report",
+  "description": "Test coverage analysis results",
+  "type": "object",
+  "properties": {
+    "summary": {
+      "type": "object",
+      "properties": {
+        "lines": {"type": "number", "minimum": 0, "maximum": 100},
+        "branches": {"type": "number", "minimum": 0, "maximum": 100},
+        "functions": {"type": "number", "minimum": 0, "maximum": 100},
+        "statements": {"type": "number", "minimum": 0, "maximum": 100}
+      },
+      "required": ["lines"]
+    },
+    "targets": {
+      "type": "object",
+      "properties": {
+        "lines": {"type": "number"},
+        "branches": {"type": "number"},
+        "functions": {"type": "number"},
+        "statements": {"type": "number"}
+      }
+    },
+    "files": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "path": {"type": "string"},
+          "coverage": {"type": "number"},
+          "uncoveredLines": {
+            "type": "array",
+            "items": {"type": "integer"}
+          },
+          "priority": {"type": "string", "enum": ["critical", "high", "medium", "low"]}
+        },
+        "required": ["path", "coverage"]
+      }
+    },
+    "gaps": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "file": {"type": "string"},
+          "lines": {"type": "array", "items": {"type": "integer"}},
+          "reason": {"type": "string"},
+          "suggestedTests": {"type": "array", "items": {"type": "string"}}
+        }
+      }
+    }
+  },
+  "required": ["summary"]
+}

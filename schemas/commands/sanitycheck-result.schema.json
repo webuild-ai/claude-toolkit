@@ -1,0 +1,86 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/webuild-ai/claude-toolkit/schemas/sanitycheck-result.json",
+  "title": "Sanity Check Result",
+  "description": "Result format for sanitycheck command output",
+  "type": "object",
+  "properties": {
+    "overallStatus": {
+      "type": "string",
+      "enum": ["READY_TO_COMMIT", "NEEDS_FIXES", "BLOCKED"],
+      "description": "Overall status of the sanity check"
+    },
+    "summary": {
+      "type": "object",
+      "properties": {
+        "total": {
+          "type": "integer",
+          "description": "Total number of checks"
+        },
+        "passed": {
+          "type": "integer"
+        },
+        "failed": {
+          "type": "integer"
+        },
+        "warnings": {
+          "type": "integer"
+        },
+        "skipped": {
+          "type": "integer"
+        }
+      },
+      "required": ["total", "passed", "failed"]
+    },
+    "checks": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "number": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 16
+          },
+          "name": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": ["pass", "fail", "warning", "skipped"]
+          },
+          "message": {
+            "type": "string"
+          },
+          "issues": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": ["number", "name", "status", "message"]
+      }
+    },
+    "criticalIssues": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "List of critical issues that must be fixed"
+    },
+    "warnings": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "suggestions": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "required": ["overallStatus", "summary", "checks"]
+}

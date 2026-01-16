@@ -1,0 +1,63 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Multi-Tenant Configuration",
+  "description": "Schema for multi-tenant application configuration",
+  "type": "object",
+  "properties": {
+    "tenants": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {"type": "string"},
+          "name": {"type": "string"},
+          "domain": {"type": "string", "format": "hostname"},
+          "database": {
+            "type": "object",
+            "properties": {
+              "host": {"type": "string"},
+              "port": {"type": "integer"},
+              "name": {"type": "string"},
+              "schema": {"type": "string"}
+            }
+          },
+          "storage": {
+            "type": "object",
+            "properties": {
+              "provider": {"type": "string", "enum": ["aws", "azure", "gcp"]},
+              "bucket": {"type": "string"},
+              "region": {"type": "string"}
+            }
+          },
+          "features": {
+            "type": "object",
+            "additionalProperties": {"type": "boolean"}
+          },
+          "limits": {
+            "type": "object",
+            "properties": {
+              "maxUsers": {"type": "integer"},
+              "maxStorage": {"type": "string"},
+              "apiRateLimit": {"type": "integer"}
+            }
+          }
+        },
+        "required": ["id", "name", "domain"]
+      }
+    },
+    "isolation": {
+      "type": "object",
+      "properties": {
+        "level": {
+          "type": "string",
+          "enum": ["database", "schema", "row"]
+        },
+        "sharedResources": {
+          "type": "array",
+          "items": {"type": "string"}
+        }
+      }
+    }
+  },
+  "required": ["tenants"]
+}

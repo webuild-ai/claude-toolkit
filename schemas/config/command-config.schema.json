@@ -1,0 +1,67 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Command Configuration",
+  "description": "Configuration schema for Claude Code commands",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "Command name (without slash)"
+    },
+    "description": {
+      "type": "string",
+      "description": "Brief description of what the command does"
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^\\d+\\.\\d+\\.\\d+$"
+    },
+    "author": {
+      "type": "string"
+    },
+    "categories": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": [
+          "git",
+          "testing",
+          "documentation",
+          "security",
+          "performance",
+          "refactoring",
+          "infrastructure",
+          "ai-agents"
+        ]
+      }
+    },
+    "requirements": {
+      "type": "object",
+      "properties": {
+        "tools": {
+          "type": "array",
+          "items": {"type": "string"},
+          "description": "Required command-line tools"
+        },
+        "languages": {
+          "type": "array",
+          "items": {"type": "string"}
+        }
+      }
+    },
+    "options": {
+      "type": "object",
+      "properties": {
+        "timeout": {
+          "type": "integer",
+          "description": "Command timeout in seconds"
+        },
+        "autoRun": {
+          "type": "boolean",
+          "description": "Whether command runs automatically"
+        }
+      }
+    }
+  },
+  "required": ["name", "description"]
+}

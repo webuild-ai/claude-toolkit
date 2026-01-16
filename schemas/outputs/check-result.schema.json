@@ -1,0 +1,70 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/webuild-ai/claude-toolkit/schemas/check-result.json",
+  "title": "Check Result",
+  "description": "Generic check result format for validation commands",
+  "type": "object",
+  "properties": {
+    "status": {
+      "type": "string",
+      "enum": ["pass", "fail", "warning", "skipped"],
+      "description": "Overall status of the check"
+    },
+    "message": {
+      "type": "string",
+      "description": "Human-readable message describing the result"
+    },
+    "details": {
+      "type": "string",
+      "description": "Detailed information about the check"
+    },
+    "suggestions": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "List of suggested actions or improvements"
+    },
+    "metadata": {
+      "type": "object",
+      "description": "Additional metadata about the check",
+      "properties": {
+        "duration": {
+          "type": "number",
+          "description": "Duration of check in milliseconds"
+        },
+        "timestamp": {
+          "type": "string",
+          "format": "date-time",
+          "description": "When the check was performed"
+        }
+      }
+    }
+  },
+  "required": ["status", "message"],
+  "examples": [
+    {
+      "status": "pass",
+      "message": "All type checks passed",
+      "details": "Checked 245 files with no errors",
+      "suggestions": [],
+      "metadata": {
+        "duration": 1245,
+        "timestamp": "2026-01-16T09:30:00Z"
+      }
+    },
+    {
+      "status": "fail",
+      "message": "Security vulnerabilities found",
+      "details": "Found 3 high severity issues",
+      "suggestions": [
+        "Update package 'requests' to version 2.31.0",
+        "Remove hardcoded API key from config.py"
+      ],
+      "metadata": {
+        "duration": 3200,
+        "timestamp": "2026-01-16T09:30:00Z"
+      }
+    }
+  ]
+}

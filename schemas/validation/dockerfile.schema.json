@@ -1,0 +1,59 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Dockerfile Validation",
+  "description": "Schema for Dockerfile validation rules",
+  "type": "object",
+  "properties": {
+    "baseImage": {
+      "type": "object",
+      "properties": {
+        "name": {"type": "string"},
+        "tag": {"type": "string"},
+        "digest": {"type": "string"},
+        "size": {"type": "string"}
+      },
+      "required": ["name"]
+    },
+    "stages": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": {"type": "string"},
+          "from": {"type": "string"},
+          "commands": {"type": "integer"}
+        }
+      }
+    },
+    "security": {
+      "type": "object",
+      "properties": {
+        "runAsRoot": {"type": "boolean"},
+        "hasHealthcheck": {"type": "boolean"},
+        "exposedPorts": {"type": "array", "items": {"type": "integer"}},
+        "vulnerabilities": {"type": "integer"}
+      }
+    },
+    "optimization": {
+      "type": "object",
+      "properties": {
+        "layerCount": {"type": "integer"},
+        "totalSize": {"type": "string"},
+        "hasMultiStage": {"type": "boolean"},
+        "hasDockerignore": {"type": "boolean"}
+      }
+    },
+    "issues": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "line": {"type": "integer"},
+          "severity": {"type": "string"},
+          "issue": {"type": "string"},
+          "suggestion": {"type": "string"}
+        }
+      }
+    }
+  }
+}

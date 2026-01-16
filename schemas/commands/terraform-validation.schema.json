@@ -1,0 +1,64 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Terraform Validation Result",
+  "description": "Results from Terraform validation and security scanning",
+  "type": "object",
+  "properties": {
+    "syntax": {
+      "type": "object",
+      "properties": {
+        "valid": {"type": "boolean"},
+        "errors": {"type": "array", "items": {"type": "string"}}
+      },
+      "required": ["valid"]
+    },
+    "format": {
+      "type": "object",
+      "properties": {
+        "formatted": {"type": "boolean"},
+        "filesNeedingFormat": {"type": "array", "items": {"type": "string"}}
+      }
+    },
+    "security": {
+      "type": "object",
+      "properties": {
+        "passed": {"type": "integer"},
+        "failed": {"type": "integer"},
+        "issues": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "severity": {"type": "string", "enum": ["LOW", "MEDIUM", "HIGH", "CRITICAL"]},
+              "file": {"type": "string"},
+              "line": {"type": "integer"},
+              "issue": {"type": "string"},
+              "remediation": {"type": "string"}
+            },
+            "required": ["severity", "file", "issue"]
+          }
+        }
+      }
+    },
+    "plan": {
+      "type": "object",
+      "properties": {
+        "add": {"type": "integer"},
+        "change": {"type": "integer"},
+        "destroy": {"type": "integer"}
+      }
+    },
+    "bestPractices": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "issue": {"type": "string"},
+          "file": {"type": "string"},
+          "recommendation": {"type": "string"}
+        }
+      }
+    }
+  },
+  "required": ["syntax"]
+}
