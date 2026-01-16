@@ -1,100 +1,182 @@
-# Claude Toolkit
+<div align="center">
 
-A collection of tools, commands, and utilities for [Claude Code](https://github.com/anthropics/claude-code) and Claude workflows.
+# 🛠️ Claude Toolkit
 
-## Installation
+**A comprehensive collection of commands, prompts, and utilities for [Claude Code](https://github.com/anthropics/claude-code)**
+
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
+[![Commands](https://img.shields.io/badge/Commands-25-brightgreen.svg)](#commands)
+[![Prompts](https://img.shields.io/badge/Prompts-8-orange.svg)](#prompts)
+[![Schemas](https://img.shields.io/badge/Schemas-10-purple.svg)](#schemas)
+
+</div>
+
+---
+
+## 📦 Quick Start
 
 ```bash
+# Clone the repository
 git clone https://github.com/YOUR_USERNAME/claude-toolkit.git
 cd claude-toolkit
+
+# Install all commands
 make install
 ```
 
-## Commands
+## ⚡ Features
 
-Personal slash commands for Claude Code.
+<table>
+<tr>
+<td width="25%">
 
-| Command | Description |
-|---------|-------------|
-| `/sanitycheck` | Comprehensive pre-commit validation with 16 checks |
+### 🎯 Commands
+25 specialized slash commands covering Git workflows, code quality, testing, documentation, and infrastructure
 
-### /sanitycheck
+</td>
+<td width="25%">
 
-Performs 16 comprehensive checks before committing:
+### 📝 Prompts
+8 reusable prompt templates organized by purpose (validation, analysis, generation)
 
-| # | Check | Description |
-|---|-------|-------------|
-| 1 | Console Cleanup | Remove debug statements |
-| 2 | Formatting | Verify code formatting (Prettier) |
-| 3 | Exception/Logging | Validate error handling |
-| 4 | Imports | Clean up unused/duplicate imports |
-| 5 | Dead Code | Find unused code |
-| 6 | Security | Scan for vulnerabilities, secrets, XSS |
-| 7 | Accessibility | WCAG compliance checks |
-| 8 | Git Workflow | Merge conflicts, secrets, conventions |
-| 9 | Linting | ESLint + TypeScript checks |
-| 10 | Dependency Audit | npm audit for vulnerabilities |
-| 11 | TODO/FIXME | Track new comments |
-| 12 | Environment Vars | Check env var handling |
-| 13 | Lock File | package-lock.json consistency |
-| 14 | Bundle Size | Check bundle size impact |
-| 15 | Tests | Run tests, add if needed |
-| 16 | Build | Verify successful build |
+</td>
+<td width="25%">
 
-## Usage
+### 📋 Schemas
+10 JSON schemas for validation and structured data definitions
 
-Once installed, use commands in any Claude Code session:
+</td>
+<td width="25%">
 
-```
-/sanitycheck
-```
+### 💡 Examples
+8 real-world examples showing workflows and integrations
 
-### Auto-run Before Commits
+</td>
+</tr>
+</table>
 
-Add to your `~/.claude/CLAUDE.md` to automatically run before every git commit:
+[→ View all commands](commands/) | [→ Browse prompts](prompts/) | [→ See examples](examples/) | [→ Check schemas](schemas/)
 
-```markdown
-## Pre-Commit Requirements
+## 🚀 Usage Notes
 
-### Sanity Check Before Commits
-**ALWAYS** run the `/sanitycheck` command before creating any git commit, whether:
-- Using `git commit` directly in terminal
-- Using any git MCP tools
-- Being asked to commit changes
+### Shell Compatibility
 
-This is a mandatory step - do not skip it.
-```
+> **Note:** Commands use `zsh -i -c "npm ..."` syntax for npm commands.
 
-## Structure
+<details>
+<summary><b>Using a different shell? Click here</b></summary>
+
+<br>
+
+| Shell | Syntax | Example |
+|-------|--------|---------|
+| **Zsh** (default) | `zsh -i -c "npm ..."` | `zsh -i -c "npm run lint"` |
+| **Bash** | `bash -c "npm ..."` | `bash -c "npm run lint"` |
+| **Fish** | `fish -c "npm ..."` | `fish -c "npm run lint"` |
+| **Direct** | `npm ...` | `npm run lint` |
+
+</details>
+
+## 📂 Repository Structure
 
 ```
 claude-toolkit/
-├── commands/              # Slash commands for Claude Code
-│   └── sanitycheck.md
+├── 🎯 commands/           # 25 slash commands for Claude Code
+│   ├── Git & PR Workflows (5)
+│   ├── Code Quality & Refactoring (4)
+│   ├── Testing & Quality (4)
+│   ├── Documentation (3)
+│   ├── Development Workflows (3)
+│   ├── Infrastructure/DevOps (4)
+│   └── AI/Agent Specific (3)
+├── 📝 prompts/            # 8 reusable prompt templates
+│   ├── validation/        # Security, multi-cloud, Terraform
+│   ├── analysis/          # Code smells, performance, Docker
+│   └── generation/        # Tests, commits
+├── 💡 examples/           # 8 real-world examples
+│   ├── commands/          # Command usage examples
+│   ├── workflows/         # Multi-step workflows
+│   └── integrations/      # GitHub Actions, Slack
+├── 📋 schemas/            # 10 JSON schemas
+│   ├── commands/          # Command result schemas
+│   ├── validation/        # Validation rules
+│   ├── config/            # Configuration schemas
+│   └── outputs/           # Output formats
 ├── Makefile               # Installation automation
 └── README.md
 ```
 
-## Make Targets
+## 🔧 Make Targets
 
-```bash
-make install    # Install commands to ~/.claude/commands
-make uninstall  # Remove installed commands
-make list       # List available commands
-make check      # Check installation status
-make help       # Show help
-```
+| Command | Description |
+|---------|-------------|
+| `make install` | 📥 Install all commands to `~/.claude/commands` |
+| `make uninstall` | 🗑️ Remove installed commands |
+| `make list` | 📋 List available commands |
+| `make check` | ✅ Check installation status |
+| `make help` | ❓ Show help message |
 
-## Contributing
+## 🌟 Highlights
 
-Contributions welcome! This toolkit can include:
+### Featured Commands
 
-- **Commands** - Slash commands for Claude Code
-- **Prompts** - Reusable prompt templates
-- **Hooks** - Pre/post execution hooks
-- **Configs** - Claude Code configuration examples
-- **Scripts** - Helper scripts for Claude workflows
+| Command | Purpose |
+|---------|---------|
+| [`/sanitycheck`](commands/sanitycheck.md) | 🔍 Run 16 comprehensive pre-commit checks |
+| [`/commit`](commands/commit.md) | 💬 Create conventional commits with proper formatting |
+| [`/pr-review`](commands/pr-review.md) | 👀 Perform thorough code review checklist |
+| [`/rebase`](commands/rebase.md) | 🔀 Interactive rebase with guided conflict resolution |
+| [`/test-coverage`](commands/test-coverage.md) | 📊 Analyze test coverage and identify gaps |
 
-## License
+[→ View all 25 commands](commands/README.md)
 
-MIT
+## 🤝 Contributing
+
+Contributions are welcome! This toolkit accepts:
+
+<table>
+<tr>
+<td>
+
+**✨ Commands**
+- Slash commands for Claude Code
+- Workflow automation
+
+</td>
+<td>
+
+**📝 Prompts**
+- Reusable templates
+- Best practices
+
+</td>
+<td>
+
+**🔧 Utilities**
+- Hooks & configs
+- Helper scripts
+
+</td>
+<td>
+
+**📚 Documentation**
+- Examples & guides
+- Integration patterns
+
+</td>
+</tr>
+</table>
+
+## 📄 License
+
+MIT License - feel free to use and modify for your projects!
+
+---
+
+<div align="center">
+
+**Made with ❤️ for the Claude Code community**
+
+[Report Bug](https://github.com/YOUR_USERNAME/claude-toolkit/issues) · [Request Feature](https://github.com/YOUR_USERNAME/claude-toolkit/issues) · [Documentation](https://github.com/YOUR_USERNAME/claude-toolkit/wiki)
+
+</div>
