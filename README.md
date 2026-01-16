@@ -167,6 +167,40 @@ Contributions are welcome! This toolkit accepts:
 </tr>
 </table>
 
+### How to Contribute
+
+We follow a standard branch/PR workflow for all contributions:
+
+1. **Create a branch** with a descriptive name:
+   ```bash
+   git checkout -b feat/new-command      # For new commands
+   git checkout -b docs/update-readme    # For documentation
+   git checkout -b fix/command-bug       # For bug fixes
+   ```
+
+2. **Make your changes**:
+   - Add new commands to `commands/`
+   - Create prompts in `prompts/`
+   - Add schemas to `schemas/`
+   - Write examples in `examples/`
+   - Update documentation as needed
+
+3. **Commit with conventional format**:
+   ```bash
+   git commit -m "feat: add new deployment command"
+   git commit -m "docs: improve rebase command examples"
+   git commit -m "fix: correct schema validation in pr-review"
+   ```
+
+   Conventional commit types: `feat`, `fix`, `docs`, `refactor`, `test`, `chore`
+
+4. **Push your branch**:
+   ```bash
+   git push origin feat/new-command
+   ```
+
+5. **Open a Pull Request** on GitHub for review
+
 ## 📄 License
 
 MIT License - feel free to use and modify for your projects!
