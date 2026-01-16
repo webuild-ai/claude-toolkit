@@ -8,3 +8,6 @@ Thumbs.db
 *~
 .idea/
 .vscode/
+
+# Wiki (managed separately at github.com/webuild-ai/claude-toolkit.wiki)
+wiki/
