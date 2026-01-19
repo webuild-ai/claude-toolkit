@@ -5,7 +5,7 @@
 **A comprehensive collection of commands, prompts, and utilities for [Claude Code](https://github.com/anthropics/claude-code)**
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
-[![Commands](https://img.shields.io/badge/Commands-25-brightgreen.svg)](#commands)
+[![Commands](https://img.shields.io/badge/Commands-28-brightgreen.svg)](#commands)
 [![Prompts](https://img.shields.io/badge/Prompts-8-orange.svg)](#prompts)
 [![Schemas](https://img.shields.io/badge/Schemas-10-purple.svg)](#schemas)
 
@@ -31,7 +31,7 @@ make install
 <td width="25%">
 
 ### 🎯 Commands
-25 specialized slash commands covering Git workflows, code quality, testing, documentation, and infrastructure
+28 specialized slash commands covering Git workflows, code quality, testing, documentation, and infrastructure
 
 </td>
 <td width="25%">
@@ -81,14 +81,15 @@ make install
 
 ```
 claude-toolkit/
-├── 🎯 commands/           # 25 slash commands for Claude Code
+├── 🎯 commands/           # 28 slash commands for Claude Code
 │   ├── Git & PR Workflows (5)
 │   ├── Code Quality & Refactoring (4)
 │   ├── Testing & Quality (4)
 │   ├── Documentation (3)
 │   ├── Development Workflows (3)
 │   ├── Infrastructure/DevOps (4)
-│   └── AI/Agent Specific (3)
+│   ├── AI/Agent Specific (3)
+│   └── Utility & Analysis (3)
 ├── 📝 prompts/            # 8 reusable prompt templates
 │   ├── validation/        # Security, multi-cloud, Terraform
 │   ├── analysis/          # Code smells, performance, Docker
@@ -128,7 +129,7 @@ claude-toolkit/
 | [`/rebase`](commands/rebase.md) | 🔀 Interactive rebase with guided conflict resolution |
 | [`/test-coverage`](commands/test-coverage.md) | 📊 Analyze test coverage and identify gaps |
 
-[→ View all 25 commands](commands/README.md)
+[→ View all 28 commands](commands/README.md)
 
 ## 🤝 Contributing
 
@@ -169,37 +170,44 @@ Contributions are welcome! This toolkit accepts:
 
 ### How to Contribute
 
-We follow a standard branch/PR workflow for all contributions:
+#### For External Contributors
 
-1. **Create a branch** with a descriptive name:
+1. **Fork** this repository to your GitHub account
+2. **Clone** your fork locally:
+   ```bash
+   git clone https://github.com/YOUR-USERNAME/claude-toolkit.git
+   cd claude-toolkit
+   ```
+3. **Create a branch** with a descriptive name:
    ```bash
    git checkout -b feat/new-command      # For new commands
    git checkout -b docs/update-readme    # For documentation
    git checkout -b fix/command-bug       # For bug fixes
    ```
-
-2. **Make your changes**:
-   - Add new commands to `commands/`
-   - Create prompts in `prompts/`
-   - Add schemas to `schemas/`
-   - Write examples in `examples/`
-   - Update documentation as needed
-
-3. **Commit with conventional format**:
+4. **Make your changes** and commit with conventional format:
    ```bash
    git commit -m "feat: add new deployment command"
-   git commit -m "docs: improve rebase command examples"
-   git commit -m "fix: correct schema validation in pr-review"
    ```
-
-   Conventional commit types: `feat`, `fix`, `docs`, `refactor`, `test`, `chore`
-
-4. **Push your branch**:
+5. **Push** to your fork and **open a PR** to this repo:
    ```bash
    git push origin feat/new-command
+   # Then open PR from your fork to webuild-ai/claude-toolkit
    ```
 
-5. **Open a Pull Request** on GitHub for review
+#### For Maintainers
+
+1. Create a branch directly on this repo
+2. Push and open a PR for review
+
+#### Contribution Guidelines
+
+- Add new commands to `commands/`
+- Create prompts in `prompts/`
+- Add schemas to `schemas/`
+- Write examples in `examples/`
+- Update documentation as needed
+
+**Conventional commit types**: `feat`, `fix`, `docs`, `refactor`, `test`, `chore`
 
 ## 📄 License
 

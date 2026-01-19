@@ -4,7 +4,7 @@
 
 **Slash commands that extend Claude Code with specialized workflows**
 
-![Commands](https://img.shields.io/badge/Total-25_Commands-brightgreen?style=for-the-badge)
+![Commands](https://img.shields.io/badge/Total-28_Commands-brightgreen?style=for-the-badge)
 
 </div>
 
@@ -91,6 +91,17 @@
 | `/workflow-validate` | ✅ Validate AutoGen YAML workflow specifications | Workflow validation |
 | `/mcp-server-scaffold` | 🏗️ Scaffold new MCP server with best practices | MCP development |
 | `/agent-debug` | 🐛 Debug agent communication and workflow issues | Agent debugging |
+
+</details>
+
+<details>
+<summary><h3>🔧 Utility & Analysis (3 commands)</h3></summary>
+
+| Command | Description | Quick Action |
+|---------|-------------|--------------|
+| `/asksomeone` | 📢 Generate stakeholder-friendly issue reports | Communication |
+| `/doesitwork` | ✅ Quick health check for any feature | Validation |
+| `/prompt` | 🔍 Improve prompts and verify problems | Analysis |
 
 </details>
 
