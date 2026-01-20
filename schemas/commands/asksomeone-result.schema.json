@@ -1,0 +1,215 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/webuild-ai/claude-toolkit/schemas/asksomeone-result.json",
+  "title": "Asksomeone Result",
+  "description": "Result format for asksomeone command output - stakeholder communication report",
+  "type": "object",
+  "properties": {
+    "issueTitle": {
+      "type": "string",
+      "description": "Brief title describing the issue"
+    },
+    "executiveSummary": {
+      "type": "string",
+      "description": "One paragraph summary in plain language, no technical jargon"
+    },
+    "issueType": {
+      "type": "string",
+      "enum": ["bug_report", "feature_question", "design_decision", "data_issue", "workflow_problem", "performance_concern", "user_experience"],
+      "description": "Category of the issue being reported"
+    },
+    "behavior": {
+      "type": "object",
+      "properties": {
+        "current": {
+          "type": "string",
+          "description": "What users are currently experiencing"
+        },
+        "expected": {
+          "type": "string",
+          "description": "What users should experience"
+        },
+        "gap": {
+          "type": "string",
+          "description": "Explanation of the difference"
+        }
+      },
+      "required": ["current", "expected", "gap"]
+    },
+    "visualReferences": {
+      "type": "array",
+      "description": "UI locations and navigation steps for manual verification",
+      "items": {
+        "type": "object",
+        "properties": {
+          "locationName": {
+            "type": "string",
+            "description": "Name of the page or feature"
+          },
+          "page": {
+            "type": "string",
+            "description": "Exact page name from navigation"
+          },
+          "lookFor": {
+            "type": "string",
+            "description": "Button text, form label, or visual element to find"
+          },
+          "where": {
+            "type": "string",
+            "description": "Location on page (top navigation, sidebar, main content, etc.)"
+          },
+          "navigationSteps": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Step-by-step navigation instructions"
+          },
+          "verificationChecklist": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Items to verify at this location"
+          }
+        },
+        "required": ["locationName", "page", "lookFor", "navigationSteps"]
+      }
+    },
+    "impact": {
+      "type": "object",
+      "properties": {
+        "endUsers": {
+          "type": "object",
+          "properties": {
+            "description": {
+              "type": "string"
+            },
+            "affectedRoles": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "frequency": {
+              "type": "string",
+              "enum": ["always", "sometimes", "rarely", "unknown"]
+            }
+          }
+        },
+        "businessProcesses": {
+          "type": "object",
+          "properties": {
+            "workflowImpact": {
+              "type": "string"
+            },
+            "processBlockers": {
+              "type": "string"
+            },
+            "timelineImpact": {
+              "type": "string"
+            }
+          }
+        },
+        "dataAndCompliance": {
+          "type": "object",
+          "properties": {
+            "dataIntegrity": {
+              "type": "string"
+            },
+            "complianceRisk": {
+              "type": "string"
+            },
+            "auditImpact": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "clarificationQuestions": {
+      "type": "array",
+      "description": "Questions for stakeholders to answer",
+      "items": {
+        "type": "object",
+        "properties": {
+          "category": {
+            "type": "string",
+            "enum": ["expected_behavior", "user_experience", "business_rules", "priority_timeline"],
+            "description": "Category of the question"
+          },
+          "question": {
+            "type": "string",
+            "description": "The specific question to ask"
+          },
+          "context": {
+            "type": "string",
+            "description": "Why this question matters"
+          },
+          "options": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Possible answers if applicable"
+          }
+        },
+        "required": ["category", "question", "context"]
+      }
+    },
+    "nextSteps": {
+      "type": "object",
+      "properties": {
+        "forStakeholders": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Action items for stakeholders"
+        },
+        "forDevelopers": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Action items for developers"
+        }
+      },
+      "required": ["forStakeholders", "forDevelopers"]
+    },
+    "technicalContext": {
+      "type": "object",
+      "description": "Technical details for developers (not shared with stakeholders)",
+      "properties": {
+        "featureModule": {
+          "type": "string"
+        },
+        "filesInvolved": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "apiEndpoints": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "databaseTables": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "relatedIssues": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  },
+  "required": ["issueTitle", "executiveSummary", "behavior", "visualReferences", "clarificationQuestions", "nextSteps"]
+}
