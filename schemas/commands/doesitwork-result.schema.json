@@ -1,0 +1,299 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/webuild-ai/claude-toolkit/schemas/doesitwork-result.json",
+  "title": "Doesitwork Result",
+  "description": "Result format for doesitwork command output - feature health check",
+  "type": "object",
+  "properties": {
+    "featureName": {
+      "type": "string",
+      "description": "Name of the feature being checked"
+    },
+    "verdict": {
+      "type": "string",
+      "enum": ["yes", "partial", "no"],
+      "description": "Quick verdict: does the feature work?"
+    },
+    "verdictIcon": {
+      "type": "string",
+      "enum": ["pass", "warning", "fail"],
+      "description": "Icon status for the verdict"
+    },
+    "summary": {
+      "type": "string",
+      "description": "One sentence TL;DR of what works and what doesn't"
+    },
+    "featureOverview": {
+      "type": "object",
+      "properties": {
+        "backendRouter": {
+          "type": "string",
+          "description": "Path to backend router file"
+        },
+        "backendService": {
+          "type": "string",
+          "description": "Path to backend service file"
+        },
+        "frontendPages": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Paths to frontend page files"
+        },
+        "databaseModels": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Names of database models involved"
+        }
+      }
+    },
+    "checks": {
+      "type": "array",
+      "description": "Results of each health check category",
+      "items": {
+        "type": "object",
+        "properties": {
+          "category": {
+            "type": "string",
+            "enum": [
+              "log_verification",
+              "api_registration",
+              "frontend_backend_alignment",
+              "request_response_models",
+              "service_implementation",
+              "templates_dependencies",
+              "database_schema",
+              "test_coverage",
+              "error_handling",
+              "security_authorization"
+            ],
+            "description": "Category of the check"
+          },
+          "name": {
+            "type": "string",
+            "description": "Human-readable name of the check"
+          },
+          "status": {
+            "type": "string",
+            "enum": ["pass", "fail", "warning", "skipped"],
+            "description": "Result of the check"
+          },
+          "issueCount": {
+            "type": "integer",
+            "minimum": 0,
+            "description": "Number of issues found"
+          },
+          "details": {
+            "type": "string",
+            "description": "Brief description of findings"
+          }
+        },
+        "required": ["category", "name", "status", "issueCount"]
+      }
+    },
+    "criticalIssues": {
+      "type": "array",
+      "description": "Issues that must be fixed",
+      "items": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string",
+            "description": "Brief title of the issue"
+          },
+          "location": {
+            "type": "string",
+            "description": "File path and line number"
+          },
+          "problem": {
+            "type": "string",
+            "description": "Description of what's wrong"
+          },
+          "impact": {
+            "type": "string",
+            "description": "What breaks because of this"
+          },
+          "fix": {
+            "type": "string",
+            "description": "How to fix it"
+          },
+          "affectsExistingFunctionality": {
+            "type": "boolean",
+            "description": "Does the fix affect other features?"
+          },
+          "requiresDbChanges": {
+            "type": "boolean",
+            "description": "Does the fix require database changes?"
+          },
+          "codeBefore": {
+            "type": "string",
+            "description": "Current problematic code"
+          },
+          "codeAfter": {
+            "type": "string",
+            "description": "Fixed code"
+          }
+        },
+        "required": ["title", "location", "problem", "impact", "fix"]
+      }
+    },
+    "warnings": {
+      "type": "array",
+      "description": "Issues that should be addressed",
+      "items": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string"
+          },
+          "location": {
+            "type": "string"
+          },
+          "problem": {
+            "type": "string"
+          },
+          "impact": {
+            "type": "string"
+          },
+          "fix": {
+            "type": "string"
+          }
+        },
+        "required": ["title", "location", "problem", "fix"]
+      }
+    },
+    "testCoverage": {
+      "type": "object",
+      "properties": {
+        "existingTests": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "path": {
+                "type": "string",
+                "description": "Path to test file"
+              },
+              "description": {
+                "type": "string",
+                "description": "What the tests cover"
+              }
+            },
+            "required": ["path", "description"]
+          }
+        },
+        "missingCoverage": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "description": "Description of missing test coverage"
+          }
+        }
+      }
+    },
+    "suggestedFixes": {
+      "type": "array",
+      "description": "Detailed fix instructions",
+      "items": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string"
+          },
+          "filesToModify": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "changes": {
+            "type": "string",
+            "description": "Description or code diff of changes"
+          },
+          "testingRequired": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "impactAssessment": {
+            "type": "object",
+            "properties": {
+              "affectsExisting": {
+                "type": "boolean"
+              },
+              "requiresDbChanges": {
+                "type": "boolean"
+              },
+              "breakingChanges": {
+                "type": "boolean"
+              }
+            }
+          }
+        },
+        "required": ["title", "filesToModify", "changes"]
+      }
+    },
+    "databaseChangesRequired": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "description": "Database changes needed"
+      }
+    },
+    "overallStatus": {
+      "type": "object",
+      "properties": {
+        "doesItWork": {
+          "type": "string",
+          "enum": ["yes", "partial", "no"]
+        },
+        "readyForProduction": {
+          "type": "boolean"
+        },
+        "confidenceLevel": {
+          "type": "string",
+          "enum": ["high", "medium", "low"]
+        },
+        "confidenceReason": {
+          "type": "string",
+          "description": "Why this confidence level"
+        }
+      },
+      "required": ["doesItWork", "readyForProduction", "confidenceLevel"]
+    },
+    "nextSteps": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "description": "Priority-ordered action items"
+      }
+    },
+    "commandsToRun": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "description": "Shell commands for fixes and testing"
+      }
+    },
+    "filesRequiringReview": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string"
+          },
+          "reason": {
+            "type": "string"
+          }
+        },
+        "required": ["path", "reason"]
+      }
+    }
+  },
+  "required": ["featureName", "verdict", "summary", "checks", "overallStatus", "nextSteps"]
+}
