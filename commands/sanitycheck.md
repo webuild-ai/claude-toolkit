@@ -37,6 +37,20 @@ Review recent changes for proper exception handling and logging:
 - Ensure error messages are descriptive and actionable
 - Verify logging levels are appropriate (error vs warn vs info vs debug)
 
+**Clear-text Logging of Sensitive Information (High Priority):**
+- Trace data flow from sensitive sources (Pydantic Settings models, config classes, auth objects) through exception handlers
+- Check if exception messages could expose sensitive field values when caught and logged
+- Look for patterns like `except Exception as e: print(f"...{e}")` or `logger.error(f"...{e}")` where `e` may contain sensitive config
+- Identify Settings/Config classes with sensitive fields (password, secret, token, key, credential) and ensure their string representations don't expose values
+- Check if `__repr__` or `__str__` methods of config objects could leak secrets when logged in exceptions
+
+**Log Injection Prevention (High Priority):**
+- Detect user-controlled input being logged without sanitization
+- Look for log statements containing: request parameters, URL paths, headers, form data, query strings, tool names, user IDs
+- Ensure user-provided values are sanitized before logging by removing/escaping: `\r`, `\n`, and other control characters
+- Check for patterns like `logger.info(f"...{user_input}...")` without prior sanitization
+- Recommend sanitization pattern: `safe_value = str(value).replace("\r", "").replace("\n", "")`
+
 ### 4. Import Review
 
 Check all imports in modified files:
@@ -65,6 +79,31 @@ Perform security analysis on changed files:
 - Verify proper input validation and sanitization
 - Check for exposed sensitive routes or endpoints
 - Review any new dependencies for known vulnerabilities
+
+**PostMessage Origin Verification (High Priority - Frontend):**
+- Detect `window.addEventListener("message", ...)` or `addEventListener("message", ...)` handlers
+- Verify handler checks `event.origin` against an expected/allowed origin before processing
+- Verify handler optionally validates `event.source` matches expected window (e.g., popup reference)
+- Flag handlers that access `event.data` without prior origin validation
+- Recommended pattern:
+  ```javascript
+  const handleMessage = (event: MessageEvent) => {
+    if (event.origin !== expectedOrigin) return;
+    if (event.source !== expectedSource) return;
+    // Now safe to process event.data
+  };
+  ```
+
+**OAuth/Popup Security (Medium Priority):**
+- When OAuth flows use popup windows, ensure:
+  - The expected origin is derived from the OAuth URL (e.g., `new URL(authUrl).origin`)
+  - Message handlers validate both `event.origin` and `event.source`
+  - Popup references are properly tracked and validated
+
+**API Input Validation (Medium Priority):**
+- Check that route handlers validate and sanitize path parameters, query params, and request bodies
+- Ensure user-controlled values used in file paths, database queries, or shell commands are validated
+- Look for path traversal vulnerabilities (`../` in file paths from user input)
 
 ### 7. Accessibility (a11y) Review
 
