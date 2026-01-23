@@ -28,6 +28,16 @@ Check for formatting issues:
 - Line length violations
 - Trailing whitespace
 
+**Post-Formatting Verification (High Priority):**
+After running the formatter, verify no new changes were introduced:
+```bash
+git status --short
+```
+- If the formatter modified any files, those changes MUST be staged before continuing
+- Common formatting changes include: trailing whitespace removal, line ending normalization, indent fixes
+- Do NOT proceed with sanitycheck if formatter introduced unstaged changes
+- Stage formatting changes immediately: `git add <modified-files>`
+
 ### 3. Exception and Logging Review
 
 Review recent changes for proper exception handling and logging:
@@ -138,6 +148,14 @@ If linting fails, run the auto-fix:
 zsh -i -c "npm run lint"
 ```
 
+**Post-Linting Verification:**
+If auto-fix was run, verify no new changes were introduced:
+```bash
+git status --short
+```
+- If the linter modified any files, those changes MUST be staged before continuing
+- Stage linting fixes immediately: `git add <modified-files>`
+
 Also run type checking:
 ```bash
 zsh -i -c "npm run typecheck"
@@ -182,6 +200,14 @@ Check:
 - package-lock.json is in sync with package.json
 - No unexpected dependency changes
 - Lock file is committed alongside package.json changes
+
+**Post-Install Verification:**
+After running npm install, verify lock file changes are staged:
+```bash
+git status --short
+```
+- If package-lock.json was modified, it MUST be staged before continuing
+- Stage lock file changes: `git add package-lock.json` (or pnpm-lock.yaml, yarn.lock, etc.)
 
 ### 14. Bundle Size Impact
 
