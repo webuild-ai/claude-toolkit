@@ -248,6 +248,25 @@ Check for:
 - Bundle size changes
 - Missing assets or resources
 
+### 17. Security Review
+
+Perform a dedicated security review using the `/security-review` command:
+- Conduct a thorough security analysis of all changed code
+- Identify potential security vulnerabilities and attack vectors
+- Review authentication and authorization implementations
+- Check for data exposure risks and sensitive information handling
+- Validate input sanitization and output encoding
+- Assess cryptographic usage and secure communication
+
+### 18. Final Code Review
+
+Run a comprehensive code review using the `/review` command to catch any remaining issues:
+- This will perform an in-depth analysis of all changed code
+- Review for code quality, best practices, and potential improvements
+- Identify any patterns or anti-patterns that may have been missed
+- Check for consistency with the existing codebase
+- Verify documentation and comments are adequate
+
 ## Output Format
 
 After completing all checks, provide a summary:
@@ -273,6 +292,8 @@ After completing all checks, provide a summary:
 | Bundle Size               | ✅/❌   | N      |
 | Tests                     | ✅/❌   | N      |
 | Build                     | ✅/❌   | N      |
+| Security Review           | ✅/❌   | N      |
+| Final Code Review         | ✅/❌   | N      |
 
 ### Critical Issues (Must Fix)
 - [List any blocking issues]
