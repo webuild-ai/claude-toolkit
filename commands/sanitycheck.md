@@ -28,6 +28,16 @@ Check for formatting issues:
 - Line length violations
 - Trailing whitespace
 
+**Post-Formatting Verification (High Priority):**
+After running the formatter, verify no new changes were introduced:
+```bash
+git status --short
+```
+- If the formatter modified any files, those changes MUST be staged before continuing
+- Common formatting changes include: trailing whitespace removal, line ending normalization, indent fixes
+- Do NOT proceed with sanitycheck if formatter introduced unstaged changes
+- Stage formatting changes immediately: `git add <modified-files>`
+
 ### 3. Exception and Logging Review
 
 Review recent changes for proper exception handling and logging:
@@ -36,6 +46,20 @@ Review recent changes for proper exception handling and logging:
 - Check that sensitive data is not logged (passwords, tokens, PII)
 - Ensure error messages are descriptive and actionable
 - Verify logging levels are appropriate (error vs warn vs info vs debug)
+
+**Clear-text Logging of Sensitive Information (High Priority):**
+- Trace data flow from sensitive sources (Pydantic Settings models, config classes, auth objects) through exception handlers
+- Check if exception messages could expose sensitive field values when caught and logged
+- Look for patterns like `except Exception as e: print(f"...{e}")` or `logger.error(f"...{e}")` where `e` may contain sensitive config
+- Identify Settings/Config classes with sensitive fields (password, secret, token, key, credential) and ensure their string representations don't expose values
+- Check if `__repr__` or `__str__` methods of config objects could leak secrets when logged in exceptions
+
+**Log Injection Prevention (High Priority):**
+- Detect user-controlled input being logged without sanitization
+- Look for log statements containing: request parameters, URL paths, headers, form data, query strings, tool names, user IDs
+- Ensure user-provided values are sanitized before logging by removing/escaping: `\r`, `\n`, and other control characters
+- Check for patterns like `logger.info(f"...{user_input}...")` without prior sanitization
+- Recommend sanitization pattern: `safe_value = str(value).replace("\r", "").replace("\n", "")`
 
 ### 4. Import Review
 
@@ -65,6 +89,31 @@ Perform security analysis on changed files:
 - Verify proper input validation and sanitization
 - Check for exposed sensitive routes or endpoints
 - Review any new dependencies for known vulnerabilities
+
+**PostMessage Origin Verification (High Priority - Frontend):**
+- Detect `window.addEventListener("message", ...)` or `addEventListener("message", ...)` handlers
+- Verify handler checks `event.origin` against an expected/allowed origin before processing
+- Verify handler optionally validates `event.source` matches expected window (e.g., popup reference)
+- Flag handlers that access `event.data` without prior origin validation
+- Recommended pattern:
+  ```javascript
+  const handleMessage = (event: MessageEvent) => {
+    if (event.origin !== expectedOrigin) return;
+    if (event.source !== expectedSource) return;
+    // Now safe to process event.data
+  };
+  ```
+
+**OAuth/Popup Security (Medium Priority):**
+- When OAuth flows use popup windows, ensure:
+  - The expected origin is derived from the OAuth URL (e.g., `new URL(authUrl).origin`)
+  - Message handlers validate both `event.origin` and `event.source`
+  - Popup references are properly tracked and validated
+
+**API Input Validation (Medium Priority):**
+- Check that route handlers validate and sanitize path parameters, query params, and request bodies
+- Ensure user-controlled values used in file paths, database queries, or shell commands are validated
+- Look for path traversal vulnerabilities (`../` in file paths from user input)
 
 ### 7. Accessibility (a11y) Review
 
@@ -98,6 +147,14 @@ If linting fails, run the auto-fix:
 ```bash
 zsh -i -c "npm run lint"
 ```
+
+**Post-Linting Verification:**
+If auto-fix was run, verify no new changes were introduced:
+```bash
+git status --short
+```
+- If the linter modified any files, those changes MUST be staged before continuing
+- Stage linting fixes immediately: `git add <modified-files>`
 
 Also run type checking:
 ```bash
@@ -144,6 +201,14 @@ Check:
 - No unexpected dependency changes
 - Lock file is committed alongside package.json changes
 
+**Post-Install Verification:**
+After running npm install, verify lock file changes are staged:
+```bash
+git status --short
+```
+- If package-lock.json was modified, it MUST be staged before continuing
+- Stage lock file changes: `git add package-lock.json` (or pnpm-lock.yaml, yarn.lock, etc.)
+
 ### 14. Bundle Size Impact
 
 For frontend changes, consider bundle size impact:
@@ -183,6 +248,25 @@ Check for:
 - Bundle size changes
 - Missing assets or resources
 
+### 17. Security Review
+
+Perform a dedicated security review using the `/security-review` command:
+- Conduct a thorough security analysis of all changed code
+- Identify potential security vulnerabilities and attack vectors
+- Review authentication and authorization implementations
+- Check for data exposure risks and sensitive information handling
+- Validate input sanitization and output encoding
+- Assess cryptographic usage and secure communication
+
+### 18. Final Code Review
+
+Run a comprehensive code review using the `/review` command to catch any remaining issues:
+- This will perform an in-depth analysis of all changed code
+- Review for code quality, best practices, and potential improvements
+- Identify any patterns or anti-patterns that may have been missed
+- Check for consistency with the existing codebase
+- Verify documentation and comments are adequate
+
 ## Output Format
 
 After completing all checks, provide a summary:
@@ -208,6 +292,8 @@ After completing all checks, provide a summary:
 | Bundle Size               | ✅/❌   | N      |
 | Tests                     | ✅/❌   | N      |
 | Build                     | ✅/❌   | N      |
+| Security Review           | ✅/❌   | N      |
+| Final Code Review         | ✅/❌   | N      |
 
 ### Critical Issues (Must Fix)
 - [List any blocking issues]
