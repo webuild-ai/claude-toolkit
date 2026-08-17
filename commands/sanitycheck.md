@@ -17,8 +17,9 @@ Scan changed files for debug statements that should be removed:
 
 ### 2. Formatting Check
 
-Verify code formatting is consistent:
+Verify code formatting is consistent. Capture a snapshot of the working tree BEFORE running the formatter so its changes can be isolated afterwards:
 ```bash
+git status --short > /tmp/pre-format-status
 zsh -i -c "npm run format"
 ```
 
@@ -29,14 +30,15 @@ Check for formatting issues:
 - Trailing whitespace
 
 **Post-Formatting Verification (High Priority):**
-After running the formatter, verify no new changes were introduced:
+After running the formatter, compare against the pre-format snapshot to isolate what the formatter changed:
 ```bash
-git status --short
+git status --short | diff /tmp/pre-format-status - || true
 ```
-- If the formatter modified any files, those changes MUST be staged before continuing
+- Only files appearing in this comparison were touched by the formatter; files already modified beforehand are the user's work in progress
+- If the formatter modified files that are part of this change, stage them with `git add <modified-files>` before continuing
 - Common formatting changes include: trailing whitespace removal, line ending normalization, indent fixes
-- Do NOT proceed with sanitycheck if formatter introduced unstaged changes
-- Stage formatting changes immediately: `git add <modified-files>`
+- If the formatter reformatted an unrelated file that was clean before it ran, revert it with `git checkout -- <file>` rather than bundling it into this commit
+- NEVER run `git checkout --` on a file that already had uncommitted changes before the formatter ran; unstaged work has no recovery path. Leave such files alone and note them in the summary
 
 ### 3. Exception and Logging Review
 
@@ -59,7 +61,7 @@ Review recent changes for proper exception handling and logging:
 - Look for log statements containing: request parameters, URL paths, headers, form data, query strings, tool names, user IDs
 - Ensure user-provided values are sanitized before logging by removing/escaping: `\r`, `\n`, and other control characters
 - Check for patterns like `logger.info(f"...{user_input}...")` without prior sanitization
-- Recommend sanitization pattern: `safe_value = str(value).replace("\r", "").replace("\n", "")`
+- Recommend sanitization pattern: `safe_value = re.sub(r"[\x00-\x1f\x7f]", "", str(value))[:1000]` (strips the full control-character class and caps length; a bare `\r`/`\n` replace misses ANSI escapes and other control characters)
 
 ### 4. Import Review
 
@@ -93,10 +95,11 @@ Perform security analysis on changed files:
 **PostMessage Origin Verification (High Priority - Frontend):**
 - Detect `window.addEventListener("message", ...)` or `addEventListener("message", ...)` handlers
 - Verify handler checks `event.origin` against an expected/allowed origin before processing
-- Verify handler optionally validates `event.source` matches expected window (e.g., popup reference)
+- Verify handler validates `event.source` against the expected sender window where a reference exists (mandatory for popup flows)
 - Flag handlers that access `event.data` without prior origin validation
+- On the SENDING side, flag `postMessage(data, "*")`; a wildcard target origin leaks the payload (often a token or auth code) to whatever origin occupies the target window. Require an explicit target origin
 - Recommended pattern:
-  ```javascript
+  ```typescript
   const handleMessage = (event: MessageEvent) => {
     if (event.origin !== expectedOrigin) return;
     if (event.source !== expectedSource) return;
@@ -106,7 +109,7 @@ Perform security analysis on changed files:
 
 **OAuth/Popup Security (Medium Priority):**
 - When OAuth flows use popup windows, ensure:
-  - The expected origin is derived from the OAuth URL (e.g., `new URL(authUrl).origin`)
+  - The expected origin is the origin of the page that performs the `postMessage`, usually the redirect/callback URI origin; `new URL(authUrl).origin` is only correct when the flow starts on your own origin
   - Message handlers validate both `event.origin` and `event.source`
   - Popup references are properly tracked and validated
 
@@ -143,18 +146,20 @@ Run the project's linting tools:
 zsh -i -c "npm run lint:check"
 ```
 
-If linting fails, run the auto-fix:
+If linting fails, capture a snapshot of the working tree, then run the auto-fix:
 ```bash
+git status --short > /tmp/pre-lint-status
 zsh -i -c "npm run lint"
 ```
 
 **Post-Linting Verification:**
-If auto-fix was run, verify no new changes were introduced:
+If auto-fix was run, compare against the pre-lint snapshot to isolate what the linter changed:
 ```bash
-git status --short
+git status --short | diff /tmp/pre-lint-status - || true
 ```
-- If the linter modified any files, those changes MUST be staged before continuing
-- Stage linting fixes immediately: `git add <modified-files>`
+- If the linter modified files that are part of this change, stage them with `git add <modified-files>` before continuing
+- If the linter modified an unrelated file that was clean before it ran, revert it with `git checkout -- <file>` rather than bundling it into this commit
+- NEVER revert a file that already had uncommitted changes before the linter ran; leave it alone and note it in the summary
 
 Also run type checking:
 ```bash
@@ -202,12 +207,12 @@ Check:
 - Lock file is committed alongside package.json changes
 
 **Post-Install Verification:**
-After running npm install, verify lock file changes are staged:
+After running `npm install --package-lock-only`, verify lock file changes are staged:
 ```bash
 git status --short
 ```
-- If package-lock.json was modified, it MUST be staged before continuing
-- Stage lock file changes: `git add package-lock.json` (or pnpm-lock.yaml, yarn.lock, etc.)
+- If the lock file changed because of this change's package.json edits, stage it with `git add package-lock.json` (or pnpm-lock.yaml, yarn.lock, etc.)
+- If the lock file drifted for reasons unrelated to this change, revert it with `git checkout -- package-lock.json` and flag the drift in the summary instead of bundling it
 
 ### 14. Bundle Size Impact
 
@@ -250,7 +255,7 @@ Check for:
 
 ### 17. Security Review
 
-Perform a dedicated security review using the `/security-review` command:
+Perform a dedicated security review using the `/security-review` command (a Claude Code built-in; if it is unavailable, perform the listed checks manually). Section 6 is the quick inline scan; this is the deep dedicated pass:
 - Conduct a thorough security analysis of all changed code
 - Identify potential security vulnerabilities and attack vectors
 - Review authentication and authorization implementations
@@ -260,7 +265,7 @@ Perform a dedicated security review using the `/security-review` command:
 
 ### 18. Final Code Review
 
-Run a comprehensive code review using the `/review` command to catch any remaining issues:
+Run a comprehensive code review using the `/pr-review` command from this toolkit to catch any remaining issues. Apply its code quality, security, and testing sections to the staged diff; skip its PR metadata items (title, description, CI status) since no PR exists yet at pre-commit time:
 - This will perform an in-depth analysis of all changed code
 - Review for code quality, best practices, and potential improvements
 - Identify any patterns or anti-patterns that may have been missed

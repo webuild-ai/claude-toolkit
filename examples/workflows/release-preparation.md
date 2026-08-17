@@ -60,7 +60,7 @@ git push origin release/v2.1.0
 ```bash
 /sanitycheck
 ```
-Result: ✅ READY TO COMMIT (16/16 checks passed)
+Result: ✅ READY TO COMMIT (18/18 checks passed)
 
 ### 8. Create Release PR
 ```bash

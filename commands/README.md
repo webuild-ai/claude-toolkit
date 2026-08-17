@@ -45,7 +45,7 @@
 | `/test-generate` | ✅ Generate test cases using TDD principles | Test coverage |
 | `/test-coverage` | 📊 Analyze test coverage and identify gaps | Coverage analysis |
 | `/e2e-check` | 🔄 Validate end-to-end workflows and integrations | Integration testing |
-| `/sanitycheck` | 🔍 Comprehensive pre-commit validation (16 checks) | Pre-commit |
+| `/sanitycheck` | 🔍 Comprehensive pre-commit validation (18 checks) | Pre-commit |
 
 </details>
 
@@ -111,12 +111,12 @@
 
 **The most comprehensive pre-commit validation command**
 
-![Checks](https://img.shields.io/badge/Checks-16-blue?style=flat-square)
+![Checks](https://img.shields.io/badge/Checks-18-blue?style=flat-square)
 ![Categories](https://img.shields.io/badge/Categories-8-green?style=flat-square)
 
 </div>
 
-### 16 Comprehensive Checks
+### 18 Comprehensive Checks
 
 <table>
 <tr>
@@ -148,6 +148,10 @@
 #### ✅ Testing & Deployment (15-16)
 15. **Tests** - Run test suite
 16. **Build** - Verify production build
+
+#### 🔎 Final Review (17-18)
+17. **Security Review** - Dedicated pass via `/security-review`
+18. **Final Code Review** - Comprehensive pass via `/pr-review`
 
 </td>
 </tr>
