@@ -31,7 +31,7 @@ This directory showcases:
 🔍 **Sanity Check Example**
 
 Complete output showing:
-- All 16 checks executed
+- All 18 checks executed
 - Pass/fail/warning statuses
 - Actionable suggestions
 - Final summary
@@ -76,7 +76,7 @@ Test creation process:
 ```
 Code Changes
     ↓
-/sanitycheck (16 checks)
+/sanitycheck (18 checks)
     ↓
 Fix Issues
     ↓

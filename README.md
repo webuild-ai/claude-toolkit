@@ -123,7 +123,7 @@ claude-toolkit/
 
 | Command | Purpose |
 |---------|---------|
-| [`/sanitycheck`](commands/sanitycheck.md) | 🔍 Run 16 comprehensive pre-commit checks |
+| [`/sanitycheck`](commands/sanitycheck.md) | 🔍 Run 18 comprehensive pre-commit checks |
 | [`/commit`](commands/commit.md) | 💬 Create conventional commits with proper formatting |
 | [`/pr-review`](commands/pr-review.md) | 👀 Perform thorough code review checklist |
 | [`/rebase`](commands/rebase.md) | 🔀 Interactive rebase with guided conflict resolution |

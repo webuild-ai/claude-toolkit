@@ -71,7 +71,7 @@ Remove unused imports ✅
 ```bash
 /sanitycheck
 ```
-Result: 15/16 passed, 1 warning (bundle size increased 200KB)
+Result: 17/18 passed, 1 warning (bundle size increased 200KB)
 
 ### Build Check
 ```bash

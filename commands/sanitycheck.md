@@ -17,8 +17,9 @@ Scan changed files for debug statements that should be removed:
 
 ### 2. Formatting Check
 
-Verify code formatting is consistent:
+Verify code formatting is consistent. Capture a snapshot of the working tree BEFORE running the formatter so its changes can be isolated afterwards:
 ```bash
+git status --short > /tmp/pre-format-status
 zsh -i -c "npm run format"
 ```
 
@@ -28,6 +29,17 @@ Check for formatting issues:
 - Line length violations
 - Trailing whitespace
 
+**Post-Formatting Verification (High Priority):**
+After running the formatter, compare against the pre-format snapshot to isolate what the formatter changed:
+```bash
+git status --short | diff /tmp/pre-format-status - || true
+```
+- Only files appearing in this comparison were touched by the formatter; files already modified beforehand are the user's work in progress
+- If the formatter modified files that are part of this change, stage them with `git add <modified-files>` before continuing
+- Common formatting changes include: trailing whitespace removal, line ending normalization, indent fixes
+- If the formatter reformatted an unrelated file that was clean before it ran, revert it with `git checkout -- <file>` rather than bundling it into this commit
+- NEVER run `git checkout --` on a file that already had uncommitted changes before the formatter ran; unstaged work has no recovery path. Leave such files alone and note them in the summary
+
 ### 3. Exception and Logging Review
 
 Review recent changes for proper exception handling and logging:
@@ -36,6 +48,20 @@ Review recent changes for proper exception handling and logging:
 - Check that sensitive data is not logged (passwords, tokens, PII)
 - Ensure error messages are descriptive and actionable
 - Verify logging levels are appropriate (error vs warn vs info vs debug)
+
+**Clear-text Logging of Sensitive Information (High Priority):**
+- Trace data flow from sensitive sources (Pydantic Settings models, config classes, auth objects) through exception handlers
+- Check if exception messages could expose sensitive field values when caught and logged
+- Look for patterns like `except Exception as e: print(f"...{e}")` or `logger.error(f"...{e}")` where `e` may contain sensitive config
+- Identify Settings/Config classes with sensitive fields (password, secret, token, key, credential) and ensure their string representations don't expose values
+- Check if `__repr__` or `__str__` methods of config objects could leak secrets when logged in exceptions
+
+**Log Injection Prevention (High Priority):**
+- Detect user-controlled input being logged without sanitization
+- Look for log statements containing: request parameters, URL paths, headers, form data, query strings, tool names, user IDs
+- Ensure user-provided values are sanitized before logging by removing/escaping: `\r`, `\n`, and other control characters
+- Check for patterns like `logger.info(f"...{user_input}...")` without prior sanitization
+- Recommend sanitization pattern: `safe_value = re.sub(r"[\x00-\x1f\x7f]", "", str(value))[:1000]` (strips the full control-character class and caps length; a bare `\r`/`\n` replace misses ANSI escapes and other control characters)
 
 ### 4. Import Review
 
@@ -66,6 +92,32 @@ Perform security analysis on changed files:
 - Check for exposed sensitive routes or endpoints
 - Review any new dependencies for known vulnerabilities
 
+**PostMessage Origin Verification (High Priority - Frontend):**
+- Detect `window.addEventListener("message", ...)` or `addEventListener("message", ...)` handlers
+- Verify handler checks `event.origin` against an expected/allowed origin before processing
+- Verify handler validates `event.source` against the expected sender window where a reference exists (mandatory for popup flows)
+- Flag handlers that access `event.data` without prior origin validation
+- On the SENDING side, flag `postMessage(data, "*")`; a wildcard target origin leaks the payload (often a token or auth code) to whatever origin occupies the target window. Require an explicit target origin
+- Recommended pattern:
+  ```typescript
+  const handleMessage = (event: MessageEvent) => {
+    if (event.origin !== expectedOrigin) return;
+    if (event.source !== expectedSource) return;
+    // Now safe to process event.data
+  };
+  ```
+
+**OAuth/Popup Security (Medium Priority):**
+- When OAuth flows use popup windows, ensure:
+  - The expected origin is the origin of the page that performs the `postMessage`, usually the redirect/callback URI origin; `new URL(authUrl).origin` is only correct when the flow starts on your own origin
+  - Message handlers validate both `event.origin` and `event.source`
+  - Popup references are properly tracked and validated
+
+**API Input Validation (Medium Priority):**
+- Check that route handlers validate and sanitize path parameters, query params, and request bodies
+- Ensure user-controlled values used in file paths, database queries, or shell commands are validated
+- Look for path traversal vulnerabilities (`../` in file paths from user input)
+
 ### 7. Accessibility (a11y) Review
 
 Check for accessibility compliance in UI components:
@@ -94,10 +146,20 @@ Run the project's linting tools:
 zsh -i -c "npm run lint:check"
 ```
 
-If linting fails, run the auto-fix:
+If linting fails, capture a snapshot of the working tree, then run the auto-fix:
 ```bash
+git status --short > /tmp/pre-lint-status
 zsh -i -c "npm run lint"
 ```
+
+**Post-Linting Verification:**
+If auto-fix was run, compare against the pre-lint snapshot to isolate what the linter changed:
+```bash
+git status --short | diff /tmp/pre-lint-status - || true
+```
+- If the linter modified files that are part of this change, stage them with `git add <modified-files>` before continuing
+- If the linter modified an unrelated file that was clean before it ran, revert it with `git checkout -- <file>` rather than bundling it into this commit
+- NEVER revert a file that already had uncommitted changes before the linter ran; leave it alone and note it in the summary
 
 Also run type checking:
 ```bash
@@ -144,6 +206,14 @@ Check:
 - No unexpected dependency changes
 - Lock file is committed alongside package.json changes
 
+**Post-Install Verification:**
+After running `npm install --package-lock-only`, verify lock file changes are staged:
+```bash
+git status --short
+```
+- If the lock file changed because of this change's package.json edits, stage it with `git add package-lock.json` (or pnpm-lock.yaml, yarn.lock, etc.)
+- If the lock file drifted for reasons unrelated to this change, revert it with `git checkout -- package-lock.json` and flag the drift in the summary instead of bundling it
+
 ### 14. Bundle Size Impact
 
 For frontend changes, consider bundle size impact:
@@ -183,6 +253,25 @@ Check for:
 - Bundle size changes
 - Missing assets or resources
 
+### 17. Security Review
+
+Perform a dedicated security review using the `/security-review` command (a Claude Code built-in; if it is unavailable, perform the listed checks manually). Section 6 is the quick inline scan; this is the deep dedicated pass:
+- Conduct a thorough security analysis of all changed code
+- Identify potential security vulnerabilities and attack vectors
+- Review authentication and authorization implementations
+- Check for data exposure risks and sensitive information handling
+- Validate input sanitization and output encoding
+- Assess cryptographic usage and secure communication
+
+### 18. Final Code Review
+
+Run a comprehensive code review using the `/pr-review` command from this toolkit to catch any remaining issues. Apply its code quality, security, and testing sections to the staged diff; skip its PR metadata items (title, description, CI status) since no PR exists yet at pre-commit time:
+- This will perform an in-depth analysis of all changed code
+- Review for code quality, best practices, and potential improvements
+- Identify any patterns or anti-patterns that may have been missed
+- Check for consistency with the existing codebase
+- Verify documentation and comments are adequate
+
 ## Output Format
 
 After completing all checks, provide a summary:
@@ -208,6 +297,8 @@ After completing all checks, provide a summary:
 | Bundle Size               | ✅/❌   | N      |
 | Tests                     | ✅/❌   | N      |
 | Build                     | ✅/❌   | N      |
+| Security Review           | ✅/❌   | N      |
+| Final Code Review         | ✅/❌   | N      |
 
 ### Critical Issues (Must Fix)
 - [List any blocking issues]
