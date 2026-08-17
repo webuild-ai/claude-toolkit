@@ -20,7 +20,7 @@
 git clone https://github.com/webuild-ai/claude-toolkit.git
 cd claude-toolkit
 
-# Install all commands
+# Install all commands and skills
 make install
 ```
 
@@ -90,6 +90,9 @@ claude-toolkit/
 │   ├── Infrastructure/DevOps (4)
 │   ├── AI/Agent Specific (3)
 │   └── Utility & Analysis (3)
+├── 🧠 skills/             # Agent skills for Claude Code
+│   ├── agent-committee/   # Multi-agent committee execution with peer review
+│   └── committee-tasks/   # Decompose a goal into agent-ready tasks
 ├── 📝 prompts/            # 8 reusable prompt templates
 │   ├── validation/        # Security, multi-cloud, Terraform
 │   ├── analysis/          # Code smells, performance, Docker
@@ -111,9 +114,9 @@ claude-toolkit/
 
 | Command | Description |
 |---------|-------------|
-| `make install` | 📥 Install all commands to `~/.claude/commands` |
-| `make uninstall` | 🗑️ Remove installed commands |
-| `make list` | 📋 List available commands |
+| `make install` | 📥 Install all commands to `~/.claude/commands` and skills to `~/.claude/skills` |
+| `make uninstall` | 🗑️ Remove installed commands and skills |
+| `make list` | 📋 List available commands and skills |
 | `make check` | ✅ Check installation status |
 | `make help` | ❓ Show help message |
 
@@ -202,6 +205,7 @@ Contributions are welcome! This toolkit accepts:
 #### Contribution Guidelines
 
 - Add new commands to `commands/`
+- Add new skills to `skills/<skill-name>/SKILL.md`
 - Create prompts in `prompts/`
 - Add schemas to `schemas/`
 - Write examples in `examples/`
