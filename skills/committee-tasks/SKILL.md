@@ -39,7 +39,7 @@ The output is consumable by the `agent-committee` skill directly.
 - Single-task work — just do it; no tasks.md needed.
 - The user already has a tasks.md and just wants to execute it — go straight to `agent-committee`.
 - Pure research questions ("how does X work?") — no tasks to author.
-- The goal is so vague the user hasn't decided what they want — push back and use `idea-refine` or `spec-driven-development` first.
+- The goal is so vague the user hasn't decided what they want — push back and help the user refine the idea or write a spec first.
 
 ## Inputs
 
@@ -62,7 +62,7 @@ If the goal mentions specific files/modules, read those.
 1. Run `git rev-parse --show-toplevel` to confirm the repo root.
 2. Read the auto-discovery files above. Quote the relevant sections in your working notes — you'll need them for task descriptions.
 3. List the source tree at one level deep (`ls src/`, etc.) to learn the module boundaries. Don't read every file — that's the executing agent's job.
-4. If the codebase is large or the goal is broad, spawn an `Explore` agent with a focused query: "Where does <thing the goal touches> live? Return file paths only." Use the result to anchor task scopes.
+4. If the codebase is large or the goal is broad, spawn an `Explore` agent (or a general-purpose search agent if `Explore` is unavailable) with a focused query: "Where does <thing the goal touches> live? Return file paths only." Use the result to anchor task scopes.
 
 ### Phase 1 — Decompose
 
@@ -87,7 +87,7 @@ This is the **critical phase**. Two tasks that touch the same file CANNOT run in
 1. Build a `file → tasks` map from your candidate list.
 2. For every file with 2+ tasks: **merge those tasks into one**. Don't try to sequence them — that defeats parallelism. Combined tasks become one larger unit owned by one agent.
 3. After merging, re-check sizes. If a merged task is now too big, see if you can split the underlying work along *different* file lines (e.g. extract a helper into a new file).
-4. If a task genuinely needs to modify a file that another task also needs, the right answer is usually: rethink the boundary. Pull the shared concern into its own task that runs first (sequence it, mark it as a dependency, accept that this one is not parallelizable).
+4. If a task genuinely needs to modify a file that another task also needs, the right answer is usually: rethink the boundary. Pull the shared concern into its own task that runs first (sequence it, record it in a `**Depends on.** T<x>.<y>` field on the dependent task, accept that this one is not parallelizable; the agent-committee skill launches dependent groups in ordered waves based on this field).
 
 The output of this phase is a list where every task owns a disjoint set of files.
 
@@ -181,7 +181,7 @@ Before writing the file:
 3. **"Acceptance" is observable, not subjective.** "Code is clean" is not acceptance. "Passes `golangci-lint run` with zero issues" is.
 4. **Point to exemplars instead of explaining patterns.** "Match `src/foo/bar.go`'s error style" is shorter and clearer than three paragraphs about error handling.
 5. **Don't bury the why.** A task with no Context section is a task an agent will misinterpret. The why constrains the how when ambiguity hits.
-6. **Surface dependencies explicitly.** If T2.1 must run after T1.3, say so under Context — and prefer not to need it (parallelism wants independent tasks).
+6. **Surface dependencies explicitly.** If T2.1 must run after T1.3, record it in a `**Depends on.** T1.3` field on T2.1 — and prefer not to need it (parallelism wants independent tasks).
 7. **Keep titles imperative and short.** "Add OAuth login flow" beats "Implementation of OAuth-based authentication for user login".
 
 ## Output format reference

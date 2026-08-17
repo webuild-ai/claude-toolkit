@@ -32,7 +32,7 @@ The cost is roughly **3× a single-pass run** (implementer + reviewer + at least
 ## When NOT to Use
 
 - A single task — use one Agent call directly.
-- Tasks with heavy interdependencies — parallelism breaks down; do `incremental-implementation` instead.
+- Tasks with heavy interdependencies — parallelism breaks down; implement them sequentially instead.
 - Hot-fix work — the review loop is slow.
 - Lists under 3 items — the orchestration overhead exceeds the gain.
 - The user is cost-sensitive and hasn't asked for review — confirm before launching.
@@ -62,11 +62,12 @@ If the tasks file is missing or malformed, stop and ask the user — don't try t
    Group B: task  T1.3         → cmd/serve_test.go    → 1 implementer
    Group C: tasks T2.1 + T2.2  → proxy/router_test.go → 1 implementer
    ```
-4. **Brief the user** with a one-paragraph plan: number of implementer agents, number of reviewer agents, expected rounds, and which tasks are being combined. Get implicit approval (no objection within the message they're already reading) before launching — unless `auto mode` is active, in which case proceed.
+4. **Brief the user** with a one-paragraph plan: number of implementer agents, number of reviewer agents, expected rounds, and which tasks are being combined. Wait for the user's confirmation before launching when the run exceeds 10 tasks or the user has not explicitly asked for a committee run; otherwise the brief plan statement is enough and you may proceed straight away.
+5. **Honour declared dependencies.** If any task carries a `**Depends on.**` field, schedule its group in a later wave that launches only after the group it depends on has reached consensus; never launch dependent groups in the same parallel message.
 
 ### Phase 1 — Implementers (parallel, one tool-call message)
 
-Launch all implementers in a **single message with multiple Agent tool calls** so they run concurrently. Use `isolation: "worktree"` for true isolation.
+Launch all implementers in a **single message with multiple Agent tool calls** so they run concurrently. Use `isolation: "worktree"` for true isolation where the Agent tool supports it; if the parameter is unavailable, run the implementers against the parent repository and rely on the Phase 0 file-grouping to prevent collisions.
 
 Each implementer prompt MUST include:
 
@@ -92,7 +93,7 @@ NOTES: <concerns, branches that were unreachable, anything surprising>
 
 ### Phase 2 — Reviewers (parallel, one tool-call message)
 
-For each implementer report, launch a reviewer Agent. Prefer `subagent_type: "agent-skills:code-reviewer"` for general work, `agent-skills:security-auditor` for security-sensitive tasks, `agent-skills:test-engineer` for test-heavy work. **Send all reviewers in a single message** for parallelism.
+For each implementer report, launch a reviewer Agent. Prefer a specialised reviewer agent type when one is available in your environment (for example a code-reviewer agent for general work, a security auditor for security-sensitive tasks, a test engineer for test-heavy work); otherwise use `general-purpose`. **Send all reviewers in a single message** for parallelism.
 
 Each reviewer prompt MUST include:
 
@@ -151,9 +152,9 @@ Each agent's work is atomic: it either lands in the parent repo AND its worktree
 **For each agent that reached consensus**, do these steps in order, completing all of them for one agent before moving to the next:
 
 1. **Inspect the worktree's diff** against its base branch (`git -C <worktree> status --short` and `git -C <worktree> diff <base>...HEAD` if the agent committed, or `git -C <worktree> diff` if it didn't). Confirm the modified files match the task's "Files in scope". If anything outside scope is touched, surface it in the final report — but don't abandon the consolidation.
-2. **Copy the modified files into the parent repo.** Use plain `cp` rather than `git merge` — the agents work uncommitted and `git merge` invites cross-worktree conflict resolution that you don't want. New files are copied; modified files overwrite the parent's version (this is safe because Phase 0's file-grouping guarantees no two agents touch the same file).
+2. **Check the parent's state, then copy the modified files into the parent repo.** Before copying, confirm each target file has no uncommitted parent-side modifications (`git -C <parent> status --short -- <file>`) and that the parent HEAD has not advanced past the worktree's base; if either is true, STOP and ask the user rather than overwriting. Use plain `cp` rather than `git merge` — the agents work uncommitted and `git merge` invites cross-worktree conflict resolution that you don't want. New files are copied; modified files overwrite the parent's version, which the Phase 0 file-grouping makes safe with respect to other agents (it says nothing about the user's own edits, hence the check above).
 3. **Verify the copy.** `git -C <parent> status --short` should now show the expected files modified. If the diff in the parent doesn't match the diff in the worktree, STOP and investigate — do NOT remove the worktree.
-4. **Remove the worktree.** `git worktree remove --force <worktree-path>` (the `--force` is needed because the worktree carries uncommitted changes, which is the normal state when agents are instructed not to commit). Also prune the agent's branch if no other worktree references it: `git branch -D <worktree-branch>`.
+4. **Remove the worktree.** First snapshot its diff so the step is reversible: `git -C <worktree> diff > /tmp/<agent>.patch`. Then try `git worktree remove <worktree-path>` without `--force`; if git refuses because of the uncommitted changes you have just consolidated and snapshotted, re-run with `--force`. Prune the agent's branch with `git branch -d <worktree-branch>`, escalating to `-D` only after confirming the branch holds no unique commits (`git log <base>..<worktree-branch>` is empty).
 5. **Record the cleanup** in your working notes for the final report — list which worktrees were removed and which (if any) were kept for debugging.
 
 **Worktree preservation rules — when to KEEP a worktree:**
@@ -176,7 +177,7 @@ Once every task has consensus, the parent (you) runs the integration check direc
 Battery (adapt to project):
 
 1. **Stability**: run the full test suite **5 times** with `-count=1` (or framework equivalent for fresh runs). Surfaces flakes that single-run doesn't.
-2. **Race / concurrency** if the language supports it: `go test -race`, `pytest -p xdist`, etc.
+2. **Race / concurrency** if the language supports it: `go test -race` for Go; Python has no race detector, so run the suite in parallel (`pytest -n auto`) to surface ordering and shared-state issues.
 3. **Build**: produce the artifact (`make build`, `npm run build`, …). Confirm size sanity.
 4. **Lint / static analysis**: `golangci-lint run`, `eslint`, etc. Fall back to `go vet` / built-in if not installed.
 5. **Behavior smoke**: run the binary / start the server / hit a known endpoint. Confirm the change didn't break runtime behavior, only test files. (For coverage tasks, this is critical — agents only ran tests; you verify the binary still works.)
