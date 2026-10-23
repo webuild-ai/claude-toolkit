@@ -31,8 +31,8 @@ install: ## Install all commands to ~/.claude/commands and skills to ~/.claude/s
 		echo "Installing Claude Code skills..."; \
 		mkdir -p "$(CLAUDE_SKILLS_DIR)"; \
 		for skill in $(SKILLS); do \
-			rm -rf "$(CLAUDE_SKILLS_DIR)/$$(basename $$skill)"; \
-			cp -R "$$skill" "$(CLAUDE_SKILLS_DIR)/" || exit 1; \
+			mkdir -p "$(CLAUDE_SKILLS_DIR)/$$(basename $$skill)"; \
+			rsync -a --delete --exclude node_modules "$$skill/" "$(CLAUDE_SKILLS_DIR)/$$(basename $$skill)/" || exit 1; \
 			echo "  ✓ Installed skill: $$(basename $$skill)"; \
 		done; \
 	fi
