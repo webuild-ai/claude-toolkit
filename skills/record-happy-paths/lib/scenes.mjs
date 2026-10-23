@@ -1,5 +1,5 @@
 // Scenes for things that are not a web app: a terminal session, a file, a
-// short run of slides. Each is a local HTML page built from REAL captured
+// short run of slides, or a pre-rendered clip (for example a Remotion render). Each is a local HTML page built from REAL captured
 // output, styled from the spec's theme, and then recorded like any page
 // (file:// URLs work as baseUrl or in a goto). Nothing is invented: capture
 // the command's output or the file first, then build the page from it.
@@ -204,6 +204,34 @@ function show() {
 addEventListener("hashchange", show);
 show();`;
   return page({ title, body, theme, script });
+}
+
+// ---- clip -------------------------------------------------------------------------
+// A pre-rendered video shown full screen, such as a motion-graphics slide made
+// with Remotion in the user's project. `src` is the clip's file name in the
+// same folder as the page. It shows its first frame until the address ends in
+// #go, then plays once, and body[data-done] is set when it ends. A clip that
+// cannot be played shows an alert, so the take fails instead of recording a
+// blank screen. WebM (VP9) is the safest format, and H.264 MP4 also plays in
+// the Chromium that Playwright installs.
+export function clipPage({ title, src, fit = "contain", theme }) {
+  if (!/^[\w.-]+\.(webm|mp4)$/i.test(String(src)) || String(src).startsWith(".")) throw new Error(`clip src "${src}" must be a .webm or .mp4 file name in the page's folder`);
+  if (!["contain", "cover"].includes(fit)) throw new Error('clip fit must be "contain" or "cover"');
+  const css = `body{margin:0;overflow:hidden}video{position:fixed;inset:0;width:100vw;height:100vh;object-fit:${fit};background:inherit}
+#clip-error{position:fixed;left:50%;top:50%;transform:translate(-50%,-50%);font-size:28px}`;
+  const body = `<video id="clip" src="${esc(src)}" muted playsinline preload="auto"></video>`;
+  const script = `const v = document.getElementById("clip");
+function fail() {
+  const d = document.createElement("div"); d.id = "clip-error"; d.setAttribute("role", "alert");
+  d.textContent = "The clip could not be played (" + (v.error ? v.error.code : "unknown") + "). Check the file, or render it as WebM (VP9).";
+  document.body.appendChild(d);
+}
+v.addEventListener("error", fail);
+v.addEventListener("ended", () => { document.body.dataset.done = "1"; });
+function run() { if (location.hash === "#go" && v.paused && !v.ended) v.play().catch(fail); }
+addEventListener("hashchange", run);
+run();`;
+  return page({ title, body, theme, css, script });
 }
 
 // ---- writing ---------------------------------------------------------------------
