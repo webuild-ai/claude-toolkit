@@ -92,7 +92,8 @@ claude-toolkit/
 │   └── Utility & Analysis (3)
 ├── 🧠 skills/             # Agent skills for Claude Code
 │   ├── agent-committee/   # Multi-agent committee execution with peer review
-│   └── committee-tasks/   # Decompose a goal into agent-ready tasks
+│   ├── committee-tasks/   # Decompose a goal into agent-ready tasks
+│   └── record-happy-paths/ # Narrated, captioned demo videos of an app's main flows
 ├── 📝 prompts/            # 8 reusable prompt templates
 │   ├── validation/        # Security, multi-cloud, Terraform
 │   ├── analysis/          # Code smells, performance, Docker
